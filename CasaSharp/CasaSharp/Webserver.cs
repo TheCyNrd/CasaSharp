@@ -96,7 +96,7 @@ class WebServer
                 string image = GetDataURL("./data/images/" + plug.Value.imageName);
                 content += "<div id='plug'><div id='title'>" + plug.Value.deviceName + "</div><img src='" + image + "'><br><a href='?switch=" + plug.Value.addressCode + "&state=1'><button>On</button></a><a href='?switch=" + plug.Value.addressCode + "&state=0'><button>Off</button></a></div>";
             }
-            content += "</div><h2>CasaSharp &copy; 2017</h2></body></html>";
+            content += "</div><h2>CasaSharp &copy; TheCyNrd 2017</h2></body></html>";
             msg = Encoding.UTF8.GetBytes(content);
             context.Response.ContentLength64 = msg.Length;
             using (Stream s = context.Response.OutputStream)
