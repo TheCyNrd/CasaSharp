@@ -15,7 +15,7 @@ namespace CasaSharp
 {
     class Program
     {
-        static string usernme = "info@email.xy";
+        static string usernme = "info@email.tv";
         static string password = "password";
         static string broadcast = "192.168.1.117";
         static public Dictionary<string, List> devices = new Dictionary<string, List>();
@@ -62,36 +62,12 @@ namespace CasaSharp
             Console.WriteLine("Loading Devices...");
 
             var plugs = GetPlugs();
-            Console.Clear();
-            int i = 0;
-
-            Console.WriteLine("Smart Home-Devices: ");
-
+            
             foreach (var plug in plugs)
             {
-                Console.WriteLine("-- " + i + " - " + plug.deviceName);
                 devices.Add(plug.addressCode, plug);
-                i++;
             }
-
-            int index = 0;
-            string key = Console.ReadLine();
-            int.TryParse(key, out index);
-            Console.WriteLine("Selected Device: " + plugs[index].deviceName);
-            Console.WriteLine("Off(0) / On(1): ");
-            int state = 1;
-            key = Console.ReadLine();
-            int.TryParse(key, out state);
-            var value = (state == 1) ? "60" : "70";
-
-            string rfslave = plugs[index].addressCode;
-            string mac = plugs[index].macAddress;
-            var code = GetBasisStation();
-
-            var msg = "00ffff" + code + "08" + rfslave + value + "04040404";
-
-
-            Switch(mac, msg);
+            Console.WriteLine("Webserver running ...");
         }
 
         public static byte[] hex2bin(string hex)

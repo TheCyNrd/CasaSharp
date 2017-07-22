@@ -77,6 +77,7 @@ class WebServer
     {
         try
         {
+            CasaSharp.Program.Start();
             var context = (HttpListenerContext)listenerContext;
             var request = context.Request;
             string filename = Path.GetFileName(context.Request.RawUrl);
