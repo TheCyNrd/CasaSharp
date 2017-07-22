@@ -70,7 +70,7 @@ namespace CasaSharp
             foreach (var plug in plugs)
             {
                 Console.WriteLine("-- " + i + " - " + plug.deviceName);
-                devices.Add(plug.deviceName, plug);
+                devices.Add(plug.addressCode, plug);
                 i++;
             }
 

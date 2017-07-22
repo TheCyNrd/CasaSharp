@@ -50,10 +50,13 @@ class WebServer
 
     public static string GetDataURL(string imgFile)
     {
-        return "data:image/"
+        byte[] b = File.ReadAllBytes(imgFile);
+        string datauri = "data:image/"
                     + Path.GetExtension(imgFile).Replace(".", "")
                     + ";base64,"
                     + Convert.ToBase64String(File.ReadAllBytes(imgFile));
+        b = null;
+        return datauri;
     }
 
     private void Switch(string device,int state)
@@ -82,7 +85,7 @@ class WebServer
             string post_response = "";
 
 
-            string style = "<style>h1,h2{margin-left:20px;} body{padding:0;margin:0; background-color:#00a0e9; color:white;}#plugs{text-align:center; background-color:white;padding: 10px;line-height:30px;} #plug{background-color:white;text-align:center; font-weight:bold;-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75); margin:10px;display:inline-block; border:1px solid black; width:200px; height:200px;} #title{padding:5px;background-color:#00a0e9; color:white;} img{background-color:#00a0e9;margin-top:5px;border:1px solid black;width:100px;height:100px;} button{padding:10px;border:1px solid black;-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75); background-color:#00a0e9;color:white; margin-right:5px; }</style>";
+            string style = "<style>h1,h2{margin-left:20px;} body{padding:0;margin:0; background-color:#00a0e9; color:white;}#plugs{text-align:center; background-color:white;padding: 10px;line-height:30px;} #plug{background-color:white;text-align:center; font-weight:bold;-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75); margin:10px;display:inline-block; border:1px solid black; width:200px; height:200px;} #title{padding:5px;background-color:#00a0e9; color:white;} img{background-color:#00a0e9;margin-top:5px;border:1px solid black;width:100px;height:100px;} button{padding:10px;border:1px solid black; background-color:#00a0e9;color:white; margin-right:5px; }</style>";
 
             string content = "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'>" + style + "<title>CasaSharp</title></head><body><h1>CasaSharp</h1><h2>Smart Home Devices:</h2>";
             context.Response.StatusCode = (int)HttpStatusCode.Accepted;
@@ -90,7 +93,7 @@ class WebServer
             foreach (var plug in CasaSharp.Program.devices)
             {
                 string image = GetDataURL("./data/images/" + plug.Value.imageName);
-                content += "<div id='plug'><div id='title'>" + plug.Key + "</div><img src='" + image + "'><br><a href='?switch=" + plug.Value.deviceName + "&state=1'><button>On</button></a><a href='?switch=" + plug.Value.deviceName + "&state=0'><button>Off</button></a></div>";
+                content += "<div id='plug'><div id='title'>" + plug.Value.deviceName + "</div><img src='" + image + "'><br><a href='?switch=" + plug.Value.addressCode + "&state=1'><button>On</button></a><a href='?switch=" + plug.Value.addressCode + "&state=0'><button>Off</button></a></div>";
             }
             content += "</div><h2>CasaSharp &copy; 2017</h2></body></html>";
             msg = Encoding.UTF8.GetBytes(content);
