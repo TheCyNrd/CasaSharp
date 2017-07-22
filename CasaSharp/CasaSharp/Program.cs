@@ -15,8 +15,8 @@ namespace CasaSharp
 {
     class Program
     {
-        static string usernme = "info@irax.tv";
-        static string password = "rolliboy@O4305";
+        static string usernme = "info@email.xy";
+        static string password = "password";
         static string broadcast = "192.168.1.117";
         static public Dictionary<string, List> devices = new Dictionary<string, List>();
 
