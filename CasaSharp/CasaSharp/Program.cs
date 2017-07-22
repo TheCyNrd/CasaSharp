@@ -56,13 +56,12 @@ namespace CasaSharp
         
         public static void Start()
         {
-            devices.Clear();
-            Console.Title = "CasaControl";
+            Console.Title = "CasaSharp";
             Console.Clear();
             Console.WriteLine("Loading Devices...");
 
             var plugs = GetPlugs();
-            
+            devices.Clear();
             foreach (var plug in plugs)
             {
                 devices.Add(plug.addressCode, plug);
