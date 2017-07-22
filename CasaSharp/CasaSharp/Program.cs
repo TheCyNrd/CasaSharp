@@ -15,10 +15,10 @@ namespace CasaSharp
 {
     class Program
     {
-        static string usernme = "your@email.xy";
-        static string password = "password";
+        static string usernme = "info@irax.tv";
+        static string password = "rolliboy@O4305";
         static string broadcast = "192.168.1.117";
-
+        static public Dictionary<string, List> devices = new Dictionary<string, List>();
 
         public static string MD5(string TextToHash = null)
         {
@@ -38,7 +38,7 @@ namespace CasaSharp
             return r.list;
         }
 
-        private static string GetBasisStation()
+        public static string GetBasisStation()
         {
             WebClient _wc = new WebClient();
             string url = "http://icomen.yunext.com/api/device/wifi/list?accessKey=Q763W08JZ07V23FR99410B3PC945LT28&username=" + HttpUtility.UrlEncode(usernme) + "&password=" + MD5(password);
@@ -49,11 +49,14 @@ namespace CasaSharp
         }
         static void Main(string[] args)
         {
+            WebServer ws = new WebServer("http://*:8080/","/");
+            ws.Start();
             Start();
         }
-
-        private static void Start()
+        
+        public static void Start()
         {
+            devices.Clear();
             Console.Title = "CasaControl";
             Console.Clear();
             Console.WriteLine("Loading Devices...");
@@ -67,6 +70,7 @@ namespace CasaSharp
             foreach (var plug in plugs)
             {
                 Console.WriteLine("-- " + i + " - " + plug.deviceName);
+                devices.Add(plug.deviceName, plug);
                 i++;
             }
 
@@ -121,7 +125,7 @@ namespace CasaSharp
             return System.Text.Encoding.Default.GetString(arr);
         }
 
-        private static void Switch(string mac, string msg)
+        public static void Switch(string mac, string msg)
         {
             for (int i = 0; i < 4; i++)
             {
