@@ -2,6 +2,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
@@ -15,9 +16,7 @@ namespace CasaSharp
 {
     class Program
     {
-        static string usernme = "info@email.tv";
-        static string password = "password";
-        static string broadcast = "192.168.1.117";
+        static string usernme,password,broadcast;
         static public Dictionary<string, List> devices = new Dictionary<string, List>();
 
         public static string MD5(string TextToHash = null)
@@ -56,10 +55,18 @@ namespace CasaSharp
         
         public static void Start()
         {
+
             Console.Title = "CasaSharp";
             Console.Clear();
             Console.WriteLine("Loading Devices...");
-
+            if (Directory.Exists("./data/"))
+            {
+                Directory.CreateDirectory("./data/images/");
+                var config = new CasaSharp.Config("./conf.ini");
+                usernme = config.Value("email");
+                password = config.Value("password");
+                broadcast = config.Value("broadcast");
+            }
             var plugs = GetPlugs();
             devices.Clear();
             foreach (var plug in plugs)
