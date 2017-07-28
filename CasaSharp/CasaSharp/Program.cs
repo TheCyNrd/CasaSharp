@@ -18,6 +18,8 @@ namespace CasaSharp
     {
         static string usernme,password,broadcast;
         static public Dictionary<string, List> devices = new Dictionary<string, List>();
+        static public CasaSharp.Config config = new CasaSharp.Config("./conf.ini");
+
 
         public static string MD5(string TextToHash = null)
         {
@@ -48,7 +50,7 @@ namespace CasaSharp
         }
         static void Main(string[] args)
         {
-            WebServer ws = new WebServer("http://*:8080/","/");
+            WebServer ws = new WebServer("http://*:" + config.Value("port") + "/", "/");
             ws.Start();
             Start();
         }
@@ -58,14 +60,14 @@ namespace CasaSharp
 
             Console.Title = "CasaSharp";
             Console.Clear();
+                usernme = config.Value("email");
+                password = config.Value("password");
+                broadcast = config.Value("broadcast");
             Console.WriteLine("Loading Devices...");
             if (Directory.Exists("./data/"))
             {
                 Directory.CreateDirectory("./data/images/");
-                var config = new CasaSharp.Config("./conf.ini");
-                usernme = config.Value("email");
-                password = config.Value("password");
-                broadcast = config.Value("broadcast");
+
             }
             var plugs = GetPlugs();
             devices.Clear();
