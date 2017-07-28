@@ -23,9 +23,6 @@ class WebServer
         _listener.Prefixes.Add(uriPrefix);
         _listener.Prefixes.Add(uriPrefix);
         _listener.AuthenticationSchemes = AuthenticationSchemes.Basic;
-        login.Add(CasaSharp.Program.config.Value("webserver_login"), CasaSharp.Program.config.Value("webserver_password"));
-
-        login.Add("gast", "gast");
         _baseFolder = baseFolder;
     }
 
@@ -44,9 +41,6 @@ class WebServer
         });
         t.Start();
     }
-
-    Hashtable login = new Hashtable();
-    Hashtable loggedin = new Hashtable();
 
     public static string GetDataURL(string imgFile)
     {
@@ -75,8 +69,6 @@ class WebServer
     
     void ProcessRequest(object listenerContext)
     {
-        try
-        {
             CasaSharp.Program.Start();
             var context = (HttpListenerContext)listenerContext;
             var request = context.Request;
@@ -125,7 +117,5 @@ class WebServer
                 using (Stream s = context.Response.OutputStream)
                     s.Write(msg, 0, msg.Length);
             }
-        }
-        catch { }
     }
 }
