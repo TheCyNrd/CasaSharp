@@ -15,6 +15,7 @@ class WebServer
 {
     HttpListener _listener;
     string _baseFolder;
+    string logo = GetDataURL("./data/images/logo.png");
     public WebServer(string uriPrefix, string baseFolder)
     {
         System.Threading.ThreadPool.SetMaxThreads(50, 1000);
@@ -29,7 +30,8 @@ class WebServer
     public void Start()
     {
         _listener.Start();
-        Thread t = new Thread(delegate () {
+        Thread t = new Thread(delegate ()
+        {
             while (true)
                 try
                 {
@@ -53,10 +55,10 @@ class WebServer
         return datauri;
     }
 
-    private void Switch(string device,int state)
+    private void Switch(string device, int state)
     {
-        
         var value = (state == 1) ? "60" : "70";
+        var statestr = (state == 1) ? "On" : "Off";
 
         string rfslave = CasaSharp.Program.devices[device].addressCode;
         string mac = CasaSharp.Program.devices[device].macAddress;
@@ -64,34 +66,41 @@ class WebServer
 
         var msg = "00ffff" + code + "08" + rfslave + value + "04040404";
 
-        CasaSharp.Program.Switch(mac,msg);
+        CasaSharp.Program.Switch(mac, msg);
+        Console.WriteLine(CasaSharp.Program.devices[device].deviceName + " has been turned "+statestr);
     }
-    
+
     void ProcessRequest(object listenerContext)
     {
-            CasaSharp.Program.Start();
-            var context = (HttpListenerContext)listenerContext;
-            var request = context.Request;
-            string filename = Path.GetFileName(context.Request.RawUrl);
-            string path = Path.Combine(_baseFolder, filename);
-            byte[] msg;
-            string post_response = "";
-            HttpListenerBasicIdentity identity = (HttpListenerBasicIdentity)context.User.Identity;
-
+        CasaSharp.Program.Start();
+        var context = (HttpListenerContext)listenerContext;
+        var request = context.Request;
+        string filename = Path.GetFileName(context.Request.RawUrl);
+        string path = Path.Combine(_baseFolder, filename);
+        byte[] msg;
+        string post_response = "";
+        HttpListenerBasicIdentity identity = (HttpListenerBasicIdentity)context.User.Identity;
+        try
+        {
             if (identity.IsAuthenticated && identity.Name == CasaSharp.Program.config.Value("webserver_login") && identity.Password == CasaSharp.Program.config.Value("webserver_password"))
             {
-
-                string style = "<style>#header,#footer{background-color:#00a0e9;}h1,h2{margin-left:20px;} body{background-color:#00a0e9;padding:0;margin:0; color:white;}#plugs{text-align:center; background-color:white;padding: 10px;line-height:30px;} #plug{background-color:white;text-align:center; font-weight:bold;-webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75); -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75); margin:10px;display:inline-block; border:1px solid black; width:200px; height:200px;} #title{-webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75); padding:5px;background-color:#00a0e9; color:white;} img{background-color:#00a0e9;margin-top:5px;border:1px solid black;width:100px;height:100px;} button{padding:10px;border:1px solid black; background-color:#00a0e9;color:white; margin-right:5px; }</style>";
-
-                string content = "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'>" + style + "<title>CasaSharp</title></head><body><div id='header'><h1>CasaSharp</h1><h2>Smart Home Devices:</h2></div>";
                 context.Response.StatusCode = (int)HttpStatusCode.Accepted;
+                string style = "<style>#header,#footer{background-color:#00a0e9;} #header img{width:300px; filter: drop-shadow(5px 5px 5px #222);} h1,h2{margin-left:20px;} body{background-color:#00a0e9;padding:0;margin:0; color:white;}#plugs{text-align:center; background-color:white;padding: 10px;line-height:30px;} #plug{background-color:white;text-align:center; font-weight:bold; filter: drop-shadow(5px 5px 5px #222); margin:10px;display:inline-block; border:1px solid black; width:200px; height:200px;} #title{-webkit-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);-moz-box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75);box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.75); padding:5px;background-color:#00a0e9; color:white;} #plug img{background-color:#00a0e9;margin-top:5px;border:1px solid black;width:100px;height:100px; } button{padding:10px;border:1px solid black; background-color:#00a0e9;color:white; margin-right:5px; }</style>";
+                string content = "<!DOCTYPE html><html><head><meta name='viewport' content='width=device-width,initial-scale=1'>" + style + "<title>CasaSharp</title></head><body><div id='header'><div style='color:white;text-align:right;font-weight:bold;padding-right:200px;'>Devices - Settings - </div><h1><img src='" + logo + "'></h1><h2>Devices:</h2></div>";
+
                 content += "<div id='plugs'>";
                 foreach (var plug in CasaSharp.Program.devices)
                 {
                     string image = GetDataURL("./data/images/" + plug.Value.imageName);
                     content += "<div id='plug'><div id='title'>" + plug.Value.deviceName + "</div><img src='" + image + "'><br><a href='?switch=" + plug.Value.addressCode + "&state=1'><button>On</button></a><a href='?switch=" + plug.Value.addressCode + "&state=0'><button>Off</button></a></div>";
                 }
-                content += "</div><div id='footer'><h2>CasaSharp &copy; TheCyNrd 2017</h2></body></html>";
+
+                content += "</div><div id='footer'><div style='color:white;text-align:center;font-weight:bold;'>CasaSharp &copy; TheCyNrd 2017</div></div></body></html>";
+                msg = Encoding.UTF8.GetBytes(content);
+                context.Response.ContentLength64 = msg.Length;
+                context.Response.ContentLength64 = msg.Length;
+                using (Stream s = context.Response.OutputStream)
+                    s.Write(msg, 0, msg.Length);
                 if (request.HttpMethod == "GET" && filename.Contains("?"))
                 {
                     Dictionary<string, string> postParams = new Dictionary<string, string>();
@@ -105,17 +114,16 @@ class WebServer
                     }
                     Switch(postParams["switch"], Int32.Parse(postParams["state"]));
                 }
-                msg = Encoding.UTF8.GetBytes(content);
-                context.Response.ContentLength64 = msg.Length;
-                using (Stream s = context.Response.OutputStream)
-                    s.Write(msg, 0, msg.Length);
             }
             else
             {
+                context.Response.StatusCode = (int)HttpStatusCode.NotAcceptable;
                 msg = Encoding.UTF8.GetBytes("ACCESS DENIED");
                 context.Response.ContentLength64 = msg.Length;
                 using (Stream s = context.Response.OutputStream)
                     s.Write(msg, 0, msg.Length);
             }
+        }
+        catch { }
     }
 }

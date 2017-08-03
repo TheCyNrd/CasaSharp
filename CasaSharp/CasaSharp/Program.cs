@@ -19,11 +19,11 @@ namespace CasaSharp
         static string usernme,password,broadcast;
         static public Dictionary<string, List> devices = new Dictionary<string, List>();
         static public CasaSharp.Config config = new CasaSharp.Config("./conf.ini");
-
-
+        static WebServer ws = new WebServer("http://*:" + config.Value("port") + "/", "/");
+        static MD5 md5 = new MD5CryptoServiceProvider();
+        static WebClient _wc = new WebClient();
         public static string MD5(string TextToHash = null)
         {
-            MD5 md5 = new MD5CryptoServiceProvider();
             byte[] textToHash = Encoding.Default.GetBytes(TextToHash);
             byte[] result = md5.ComputeHash(textToHash);
 
@@ -32,7 +32,6 @@ namespace CasaSharp
 
         private static List<List> GetPlugs()
         {
-            WebClient _wc = new WebClient();
             string url = "http://icomen.yunext.com/api/device/rf/list?accessKey=Q763W08JZ07V23FR99410B3PC945LT28&username=" + HttpUtility.UrlEncode(usernme) + "&password=" + MD5(password);
             var json = _wc.DownloadString(url);
             RootObject r = JsonConvert.DeserializeObject<RootObject>(json);
@@ -41,7 +40,6 @@ namespace CasaSharp
 
         public static string GetBasisStation()
         {
-            WebClient _wc = new WebClient();
             string url = "http://icomen.yunext.com/api/device/wifi/list?accessKey=Q763W08JZ07V23FR99410B3PC945LT28&username=" + HttpUtility.UrlEncode(usernme) + "&password=" + MD5(password);
             var json = _wc.DownloadString(url);
             RootObject r = JsonConvert.DeserializeObject<RootObject>(json);
@@ -50,8 +48,9 @@ namespace CasaSharp
         }
         static void Main(string[] args)
         {
-            WebServer ws = new WebServer("http://*:" + config.Value("port") + "/", "/");
             ws.Start();
+            Console.WriteLine("Webserver running ...");
+            Console.WriteLine("Loading Devices...");
             Start();
         }
         
@@ -59,15 +58,13 @@ namespace CasaSharp
         {
 
             Console.Title = "CasaSharp";
-            Console.Clear();
+            config = new CasaSharp.Config("./conf.ini");
                 usernme = config.Value("email");
                 password = config.Value("password");
-                broadcast = config.Value("broadcast");
-            Console.WriteLine("Loading Devices...");
+            broadcast = config.Value("broadcast");
             if (Directory.Exists("./data/"))
             {
                 Directory.CreateDirectory("./data/images/");
-
             }
             var plugs = GetPlugs();
             devices.Clear();
@@ -75,7 +72,6 @@ namespace CasaSharp
             {
                 devices.Add(plug.addressCode, plug);
             }
-            Console.WriteLine("Webserver running ...");
         }
 
         public static byte[] hex2bin(string hex)
