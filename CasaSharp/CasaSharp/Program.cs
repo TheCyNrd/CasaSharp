@@ -21,7 +21,7 @@ namespace CasaSharp
         static public CasaSharp.Config config = new CasaSharp.Config("./conf.ini");
         static WebServer ws = new WebServer("http://*:" + config.Value("port") + "/", "/");
         static MD5 md5 = new MD5CryptoServiceProvider();
-        static WebClient _wc = new WebClient();
+        
         public static string MD5(string TextToHash = null)
         {
             byte[] textToHash = Encoding.Default.GetBytes(TextToHash);
@@ -32,6 +32,7 @@ namespace CasaSharp
 
         private static List<List> GetPlugs()
         {
+            WebClient _wc = new WebClient();
             string url = "http://icomen.yunext.com/api/device/rf/list?accessKey=Q763W08JZ07V23FR99410B3PC945LT28&username=" + HttpUtility.UrlEncode(usernme) + "&password=" + MD5(password);
             var json = _wc.DownloadString(url);
             RootObject r = JsonConvert.DeserializeObject<RootObject>(json);
@@ -40,6 +41,7 @@ namespace CasaSharp
 
         public static string GetBasisStation()
         {
+            WebClient _wc = new WebClient();
             string url = "http://icomen.yunext.com/api/device/wifi/list?accessKey=Q763W08JZ07V23FR99410B3PC945LT28&username=" + HttpUtility.UrlEncode(usernme) + "&password=" + MD5(password);
             var json = _wc.DownloadString(url);
             RootObject r = JsonConvert.DeserializeObject<RootObject>(json);

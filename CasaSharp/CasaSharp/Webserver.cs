@@ -16,6 +16,8 @@ class WebServer
     HttpListener _listener;
     string _baseFolder;
     string logo = GetDataURL("./data/images/logo.png");
+    Dictionary<string, string> postParams = new Dictionary<string, string>();
+    Dictionary<string, string> images = new Dictionary<string, string>();
     public WebServer(string uriPrefix, string baseFolder)
     {
         System.Threading.ThreadPool.SetMaxThreads(50, 1000);
@@ -32,6 +34,10 @@ class WebServer
         _listener.Start();
         Thread t = new Thread(delegate ()
         {
+            foreach (string img in Directory.GetFiles(Application.StartupPath + "/data/images/"))
+            {
+                images.Add(Path.GetFileName(img),GetDataURL(img));
+            }
             while (true)
                 try
                 {
@@ -79,6 +85,7 @@ class WebServer
         string path = Path.Combine(_baseFolder, filename);
         byte[] msg;
         string post_response = "";
+        postParams.Clear();
         HttpListenerBasicIdentity identity = (HttpListenerBasicIdentity)context.User.Identity;
         try
         {
@@ -91,19 +98,19 @@ class WebServer
                 content += "<div id='plugs'>";
                 foreach (var plug in CasaSharp.Program.devices)
                 {
-                    string image = GetDataURL("./data/images/" + plug.Value.imageName);
-                    content += "<div id='plug'><div id='title'>" + plug.Value.deviceName + "</div><img src='" + image + "'><br><a href='?switch=" + plug.Value.addressCode + "&state=1'><button>On</button></a><a href='?switch=" + plug.Value.addressCode + "&state=0'><button>Off</button></a></div>";
+                    content += "<div id='plug'><div id='title'>" + plug.Value.deviceName + "</div><img src='" + images[plug.Value.imageName] + "'><br><a href='?switch=" + plug.Value.addressCode + "&state=1'><button>On</button></a><a href='?switch=" + plug.Value.addressCode + "&state=0'><button>Off</button></a></div>";
                 }
 
                 content += "</div><div id='footer'><div style='color:white;text-align:center;font-weight:bold;'>CasaSharp &copy; TheCyNrd 2017</div></div></body></html>";
                 msg = Encoding.UTF8.GetBytes(content);
                 context.Response.ContentLength64 = msg.Length;
-                context.Response.ContentLength64 = msg.Length;
                 using (Stream s = context.Response.OutputStream)
+                {
                     s.Write(msg, 0, msg.Length);
+                    s.Dispose();
+                }
                 if (request.HttpMethod == "GET" && filename.Contains("?"))
                 {
-                    Dictionary<string, string> postParams = new Dictionary<string, string>();
                     string[] rawParams = filename.Split('&');
                     foreach (string param in rawParams)
                     {
